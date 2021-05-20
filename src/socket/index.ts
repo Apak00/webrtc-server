@@ -11,6 +11,7 @@ export const initSocket = (server: HTTPServer): Server<ClientEvents, ServerEvent
   io = new Server(server, {
     cors: {
       origin: [
+        'https://webrtc-client1.herokuapp.com',
         'https://localhost:8080',
         'http://localhost:8080',
         'http://localhost:5000',
