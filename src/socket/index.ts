@@ -25,11 +25,14 @@ export const initSocket = (server: HTTPServer): Server<ClientEvents, ServerEvent
   });
 
   const REDIS_URL = process.env.REDIS_URL;
+  const REDISCLOUD_URL = process.env.REDISCLOUD_URL;
   const REDIS_KEY = process.env.REDIS_KEY || 'chat-socket';
 
-  if (REDIS_URL) {
+  console.log('REDIS_URL', REDIS_URL);
+  console.log('REDIS_URL', REDISCLOUD_URL);
+  if (REDISCLOUD_URL) {
     // Runs on Heroku env
-    const redisAdapter = createAdapter(REDIS_URL, { key: REDIS_KEY });
+    const redisAdapter = createAdapter(REDISCLOUD_URL, { key: REDIS_KEY });
     io = io.adapter(redisAdapter);
   }
 
