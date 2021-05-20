@@ -1,3 +1,1 @@
-# base-app
-
-### This is my nodejs boiler plate
+# webrtc signaling nodejs server

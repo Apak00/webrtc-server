@@ -24,12 +24,9 @@ export const initSocket = (server: HTTPServer): Server<ClientEvents, ServerEvent
     },
   });
 
-  const REDIS_URL = process.env.REDIS_URL;
   const REDISCLOUD_URL = process.env.REDISCLOUD_URL;
   const REDIS_KEY = process.env.REDIS_KEY || 'chat-socket';
 
-  console.log('REDIS_URL', REDIS_URL);
-  console.log('REDIS_URL', REDISCLOUD_URL);
   if (REDISCLOUD_URL) {
     // Runs on Heroku env
     const redisAdapter = createAdapter(REDISCLOUD_URL, { key: REDIS_KEY });
@@ -37,7 +34,6 @@ export const initSocket = (server: HTTPServer): Server<ClientEvents, ServerEvent
   }
 
   io.on('connection', (socket: Socket<ClientEvents, ServerEvents>) => {
-    console.log('SOMEONE IS CONNECTED ', socket.id);
     socket.on('room:create', roomController.createRoom());
     socket.on('join:room', roomController.joinRoom(socket));
     socket.on('ice:candidate', roomController.iceCandidate(socket));
@@ -45,20 +41,5 @@ export const initSocket = (server: HTTPServer): Server<ClientEvents, ServerEvent
     socket.on('negotiation:answer', roomController.negotiationAnswer(socket));
   });
 
-  io.of('/').adapter.on('create-room', (room) => {
-    console.log(`room ${room} was created`);
-  });
-
-  io.of('/').adapter.on('delete-room', (room) => {
-    console.log(`room ${room} was deleted`);
-  });
-
-  io.of('/').adapter.on('join-room', (room, id) => {
-    console.log(`socket ${id} has joined room ${room}`);
-  });
-
-  io.of('/').adapter.on('leave-room', (room, id) => {
-    console.log(`socket ${id} has left room ${room}`);
-  });
   return io;
 };
