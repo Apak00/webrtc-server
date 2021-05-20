@@ -13,6 +13,7 @@ export const initSocket = (server: HTTPServer): Server<ClientEvents, ServerEvent
       origin: [
         'https://localhost:8080',
         'http://localhost:8080',
+        'http://localhost:5000',
         'http://0.0.0.0:8080',
         'http://192.168.1.47:8080',
         'https://192.168.1.47:8080',
