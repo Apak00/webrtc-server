@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Socket } from 'socket.io';
 import { ClientEvents } from '../socket/events';
 import { ServerEvents } from '../socket/events';
+import { io } from '../';
 
 const createRoom =
   () =>
@@ -18,31 +19,36 @@ const createRoom =
 const joinRoom =
   (socket: Socket<ClientEvents, ServerEvents>) =>
   ({ roomId }: Parameters<ClientEvents['join:room']>[0]): void => {
-    socket.join(roomId);
+    io.in(roomId)
+      .allSockets()
+      .then((sids: Set<string>) => {
+        socket.emit('join:room:response', { alreadyConnectedSids: Array.from(sids) });
+        socket.join(roomId);
+      });
   };
 
 const iceCandidate =
   (socket: Socket<ClientEvents, ServerEvents>) =>
-  ({ roomId, candidate }: Parameters<ClientEvents['ice:candidate']>[0]): void => {
-    socket.to(roomId).emit('bc:icecandidate', { candidate });
+  ({ target, candidate }: Parameters<ClientEvents['ice:candidate']>[0]): void => {
+    socket.to(target).emit('ice:candidate:forward', { candidate });
   };
 
-const negotiationOffer =
+const offer =
   (socket: Socket<ClientEvents, ServerEvents>) =>
-  ({ roomId, sdp }: Parameters<ClientEvents['negotiation:offer']>[0]): void => {
-    socket.to(roomId).emit('bc:negotiation:offer', { sdp, negotiatioterSocketId: socket.id });
+  ({ sdp, offerieSid }: Parameters<ClientEvents['offer']>[0]): void => {
+    socket.to(offerieSid).emit('offer:forward', { sdp, offererSid: socket.id });
   };
 
-const negotiationAnswer =
+const answer =
   (socket: Socket<ClientEvents, ServerEvents>) =>
-  ({ negotiatioterSocketId, sdp }: Parameters<ClientEvents['negotiation:answer']>[0]): void => {
-    socket.to(negotiatioterSocketId).emit('negotiation:answer:forward', { sdp });
+  ({ offererSid, sdp }: Parameters<ClientEvents['answer']>[0]): void => {
+    socket.to(offererSid).emit('answer:forward', { sdp, answererSid: socket.id });
   };
 
 export default {
   createRoom,
   joinRoom,
   iceCandidate,
-  negotiationOffer,
-  negotiationAnswer,
+  offer,
+  answer,
 };

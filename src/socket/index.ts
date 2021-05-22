@@ -37,8 +37,8 @@ export const initSocket = (server: HTTPServer): Server<ClientEvents, ServerEvent
     socket.on('room:create', roomController.createRoom());
     socket.on('join:room', roomController.joinRoom(socket));
     socket.on('ice:candidate', roomController.iceCandidate(socket));
-    socket.on('negotiation:offer', roomController.negotiationOffer(socket));
-    socket.on('negotiation:answer', roomController.negotiationAnswer(socket));
+    socket.on('offer', roomController.offer(socket));
+    socket.on('answer', roomController.answer(socket));
   });
 
   return io;
